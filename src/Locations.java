@@ -1,15 +1,29 @@
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 
 public class Locations implements Map<Integer, Location>  {
-    private static Map<Integer, Location> locations = new HashMap<>();
+    private static Map<Integer, Location> locations = new LinkedHashMap<>();
+
+    public static void main(String[] args) {
+        try(BufferedWriter locFile = new BufferedWriter(new FileWriter("locations_test.txt"));
+            BufferedWriter dirFile = new BufferedWriter(new FileWriter("directions_test.txt"))){
+            for(Location location : locations.values()){
+                locFile.write(location.getLocationID() + "," + location.getDescription() + "\n");
+                for(String direction: location.getExits().keySet()){
+                    if(!direction.equalsIgnoreCase("Q")){
+                        dirFile.write(location.getLocationID() + "," + direction + "," + location.getExits().get(direction) + "\n");
+                    }
+                }
+            }
+        } catch (IOException e){
+            e.getStackTrace();
+        }
+    }
 
     static{
-        try (Scanner scanner = new Scanner(new FileReader("locations_big.txt"))){
-               while(scanner.hasNextLine()){
-                String input = scanner.nextLine();
+        try (BufferedReader locFile = new BufferedReader(new FileReader("locations_big.txt"))){
+                String input;
+               while((input = locFile.readLine()) != null){
                 String[] data = input.split(",");
                 int loc = Integer.parseInt(data[0]);
                 String description = data[1];
